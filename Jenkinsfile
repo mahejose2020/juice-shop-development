@@ -11,20 +11,7 @@ pipeline {
     timeout(time: 40, unit: 'MINUTES')     // a cold build is ~10 min; leave headroom for the queue
     disableConcurrentBuilds()
     buildDiscarder(logRotator(numToKeepStr: '20'))
-  }   stage('Deploy to vm-app') {
-      steps {
-        sshagent(credentials: ['vm-app-0X']) {
-          sh '''
-            ssh -o StrictHostKeyChecking=accept-new ubuntu@192.168.3.10X "
-              docker pull $IMAGE:$TAG &&
-              (docker rm -f juice-shop 2>/dev/null || true) &&
-              docker run -d --name juice-shop --restart=unless-stopped \
-                -p 3000:3000 $IMAGE:$TAG
-            "
-          '''
-        }
-      }
-    }
+  }
 
   // Webhooks cannot reach this network -- vm-ci is on a private address.
   triggers { pollSCM('H/2 * * * *') }
