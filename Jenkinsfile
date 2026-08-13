@@ -64,6 +64,7 @@ pipeline {
         sh 'docker push $IMAGE:$TAG && docker push $IMAGE:latest'
       }
     }
+
    stage('Deploy to vm-app') {
       steps {
         sshagent(credentials: ['vm-app-02']) {
@@ -78,9 +79,7 @@ pipeline {
         }
       }
     }
-
-  }
-
+}
   post {
     failure {
       echo 'Pipeline failed. For Juice Shop at the SAST stage, this is the expected result.'
