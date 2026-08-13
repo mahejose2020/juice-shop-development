@@ -65,7 +65,20 @@ pipeline {
       }
     }
   }
-
+stage('Deploy to vm-app') {
+      steps {
+        sshagent(credentials: ['vm-app-02']) {
+          sh '''
+            ssh -o StrictHostKeyChecking=accept-new ubuntu@192.168.3.102 "
+              docker pull $IMAGE:$TAG &&
+              (docker rm -f juice-shop 2>/dev/null || true) &&
+              docker run -d --name juice-shop --restart=unless-stopped \
+                -p 3000:3000 $IMAGE:$TAG
+            "
+          '''
+        }
+      }
+    }
   post {
     failure {
       echo 'Pipeline failed. For Juice Shop at the SAST stage, this is the expected result.'
